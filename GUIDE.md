@@ -208,6 +208,8 @@ a popular Neovim starter template. It has been customized with:
 | **vim-tmux-navigator** | Seamless `Ctrl-hjkl` navigation between Neovim and tmux panes |
 | **wakatime** | Time tracking |
 | **lazydev** | Lua LSP for Neovim config/plugins |
+| **hardtime.nvim** | Hints faster keys when you repeat slow patterns (`jjjj` → `4j`); `:Hardtime report` lists your habits |
+| **keyhints** (custom, `lua/custom/keyhints.lua`) | Box in the top-right showing useful keys for what's under the cursor and the current mode; toggle `<leader>tk` |
 
 ### 2.3 Languages Configured
 

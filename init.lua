@@ -190,6 +190,57 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 -- or just use <C-\><C-n> to exit terminal mode
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
+-- Open a persistent OpenCode chat focused on this Neovim configuration.
+local nvim_chat = { buf = nil, win = nil, job = nil }
+local function toggle_nvim_chat()
+  if nvim_chat.win and vim.api.nvim_win_is_valid(nvim_chat.win) then
+    vim.api.nvim_win_close(nvim_chat.win, true)
+    nvim_chat.win = nil
+    return
+  end
+
+  local opencode = vim.fn.exepath('opencode')
+  if opencode == '' then
+    opencode = vim.fn.expand('~/.opencode/bin/opencode')
+  end
+  if vim.fn.executable(opencode) == 0 then
+    vim.notify('OpenCode CLI not found', vim.log.levels.ERROR)
+    return
+  end
+
+  if not nvim_chat.buf or not vim.api.nvim_buf_is_valid(nvim_chat.buf) or not nvim_chat.job then
+    nvim_chat.buf = vim.api.nvim_create_buf(false, true)
+    vim.bo[nvim_chat.buf].bufhidden = 'hide'
+  end
+
+  local width = math.max(1, math.floor(vim.o.columns * 0.9))
+  local height = math.max(1, math.floor(vim.o.lines * 0.85))
+  nvim_chat.win = vim.api.nvim_open_win(nvim_chat.buf, true, {
+    relative = 'editor',
+    width = width,
+    height = height,
+    row = math.floor((vim.o.lines - height) / 2),
+    col = math.floor((vim.o.columns - width) / 2),
+    style = 'minimal',
+    border = 'rounded',
+    title = ' Neovim help · OpenCode Go ',
+    title_pos = 'center',
+  })
+
+  if not nvim_chat.job then
+    nvim_chat.job = vim.fn.termopen({ opencode, '--model', 'opencode-go/glm-5.3', '--agent', 'nvim-help' }, {
+      cwd = vim.fn.stdpath('config'),
+      on_exit = function()
+        nvim_chat.job = nil
+      end,
+    })
+  end
+  vim.cmd.startinsert()
+end
+
+vim.keymap.set('n', '<leader>ac', toggle_nvim_chat, { desc = '[A]I [C]hat about Neovim config' })
+vim.keymap.set('t', '<C-g><C-a>', toggle_nvim_chat, { desc = 'Hide Neovim AI chat' })
+
 -- TIP: Disable arrow keys in normal mode
 -- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
 -- vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
@@ -697,7 +748,7 @@ require('lazy').setup({
         --    https://github.com/pmizio/typescript-tools.nvim
         --
         -- But for many setups, the LSP (`ts_ls`) will work just fine
-        -- ts_ls = {},
+        ts_ls = {},
         --
 
         lua_ls = {
@@ -739,19 +790,16 @@ require('lazy').setup({
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
+      -- mason-lspconfig v2 auto-enables installed servers via vim.lsp.enable();
+      -- per-server overrides must be registered with vim.lsp.config().
+      for server_name, server in pairs(servers) do
+        server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+        vim.lsp.config(server_name, server)
+      end
+
       require('mason-lspconfig').setup {
         ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
-        automatic_installation = false,
-        handlers = {
-          function(server_name)
-            local server = servers[server_name] or {}
-            -- This handles overriding only values explicitly passed
-            -- by the server configuration above. Useful when disabling
-            -- certain features of an LSP (for example, turning off formatting for ts_ls)
-            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-            require('lspconfig')[server_name].setup(server)
-          end,
-        },
+        automatic_enable = true,
       }
     end,
   },
@@ -995,12 +1043,15 @@ require('lazy').setup({
         'go',
         'html',
         'javascript',
+        'json',
         'lua',
         'luadoc',
         'markdown',
         'markdown_inline',
         'python',
         'query',
+        'tsx',
+        'typescript',
         'vim',
         'vimdoc',
       }
@@ -1063,6 +1114,9 @@ require('lazy').setup({
     },
   },
 })
+
+-- Context-aware key hints box (top-right). Toggle with <leader>tk.
+require('custom.keyhints').setup()
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
