@@ -308,6 +308,7 @@ require('lazy').setup({
   'christoomey/vim-tmux-navigator',
   {
     'wakatime/vim-wakatime',
+    enabled = false, -- disabled; set to true (or remove this line) to turn time tracking back on
     lazy = false,
   },
 

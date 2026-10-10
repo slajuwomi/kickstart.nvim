@@ -206,7 +206,7 @@ a popular Neovim starter template. It has been customized with:
 | **gruvbox** | Retro dark colorscheme |
 | **guess-indent** | Auto-detects indentation settings per file |
 | **vim-tmux-navigator** | Seamless `Ctrl-hjkl` navigation between Neovim and tmux panes |
-| **wakatime** | Time tracking |
+| **wakatime** | Time tracking (disabled via `enabled = false`) |
 | **lazydev** | Lua LSP for Neovim config/plugins |
 | **hardtime.nvim** | Hints faster keys when you repeat slow patterns (`jjjj` → `4j`); `:Hardtime report` lists your habits |
 | **keyhints** (custom, `lua/custom/keyhints.lua`) | Box in the top-right showing useful keys for what's under the cursor and the current mode; off by default, toggle `<leader>tk` |
@@ -712,8 +712,8 @@ to your `~/.tmux.conf`.
 
 ## 14. Wakatime Time Tracking
 
-`wakatime/vim-wakatime` tracks time spent coding. It loads immediately on startup
-(`lazy = false`).
+`wakatime/vim-wakatime` tracks time spent coding. It is currently **disabled**
+(`enabled = false` in its spec in `init.lua`). Remove that line to turn it back on.
 
 You must configure your Wakatime API key. Create or edit `~/.wakatime.cfg`:
 
@@ -722,8 +722,7 @@ You must configure your Wakatime API key. Create or edit `~/.wakatime.cfg`:
 api_key = YOUR_API_KEY_HERE
 ```
 
-If you don't use Wakatime, you can safely remove this plugin from `init.lua`
-(lines 255-258).
+If you don't use Wakatime, you can remove the plugin spec from `init.lua`.
 
 ---
 
