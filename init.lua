@@ -741,7 +741,7 @@ require('lazy').setup({
           filetypes = { 'html', 'css', 'javascriptreact', 'typescriptreact' },
         },
         pyright = {},
-        -- rust_analyzer = {},
+        -- rust_analyzer: see the Rust section below.
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
         -- Some languages (like typescript) have entire language plugins that can be useful:
@@ -801,6 +801,19 @@ require('lazy').setup({
         ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
         automatic_enable = true,
       }
+
+      -- Rust: rustup installs rust-analyzer. Mason does not.
+      -- Enable the server here.
+      vim.lsp.config('rust_analyzer', {
+        capabilities = capabilities,
+        settings = {
+          ['rust-analyzer'] = {
+            check = { command = 'clippy' }, -- Run clippy when you save.
+            cargo = { allFeatures = true },
+          },
+        },
+      })
+      vim.lsp.enable 'rust_analyzer'
     end,
   },
 
@@ -839,6 +852,7 @@ require('lazy').setup({
         go = { 'goimports' },
         -- Conform can also run multiple formatters sequentially
         python = { 'isort', 'black' },
+        rust = { 'rustfmt' }, -- rustup installs rustfmt.
         --
         -- You can use 'stop_after_first' to run the first available formatter from the list
         -- javascript = { "prettierd", "prettier", stop_after_first = true },
@@ -1050,6 +1064,8 @@ require('lazy').setup({
         'markdown_inline',
         'python',
         'query',
+        'rust',
+        'toml',
         'tsx',
         'typescript',
         'vim',
