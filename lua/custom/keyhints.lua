@@ -11,7 +11,7 @@
 local M = {}
 
 local ns = vim.api.nvim_create_namespace 'keyhints'
-local state = { enabled = true, buf = nil, win = nil, timer = nil, rendered = nil }
+local state = { enabled = false, buf = nil, win = nil, timer = nil, rendered = nil }
 
 local QUOTES = { ['"'] = true, ["'"] = true, ['`'] = true }
 local BRACKETS = { ['('] = '(', [')'] = '(', ['['] = '[', [']'] = '[', ['{'] = '{', ['}'] = '{' }
